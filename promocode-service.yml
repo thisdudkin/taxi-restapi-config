@@ -7,13 +7,9 @@ spring:
           name: promocode-service
         url: http://localhost:8086
   datasource:
-    url:      ${POSTGRES_URL}
-    username: ${POSTGRES_USER}
-    password: ${POSTGRES_PASS}
-  liquibase:
-    enabled: true
-  messages:
-    basename: messages
+    url:      jdbc:postgresql://localhost:5432/promocodes_db
+    username: postgres
+    password: ${POSTGRES_PASSWORD:root}
   security:
     oauth2:
       resourceserver:
@@ -58,6 +54,10 @@ spring:
     admin:
       client:
         url: http://admin-server:8086
+  datasource:
+    url:      jdbc:postgresql://postgres:5432/promocodes_db
+    username: postgres
+    password: ${POSTGRES_PASSWORD}
   security:
     oauth2:
       resourceserver:

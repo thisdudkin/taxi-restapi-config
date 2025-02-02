@@ -23,18 +23,14 @@ spring:
       missing-topics-fatal: false
       concurrency: 3
   datasource:
-    url:      ${POSTGRES_URL}
-    username: ${POSTGRES_USER}
-    password: ${POSTGRES_PASS}
+    url:      jdbc:postgresql://localhost:5432/drivers_db
+    username: postgres
+    password: ${POSTGRES_PASSWORD:root}
   security:
     oauth2:
       resourceserver:
         jwt:
           jwk-set-uri: http://localhost:9090/realms/taxi-realm/protocol/openid-connect/certs
-  liquibase:
-    enabled: true
-  messages:
-    basename: messages
   jpa:
     hibernate:
       ddl-auto: none
@@ -91,11 +87,17 @@ spring:
         url: http://admin-server:8086
   kafka:
     bootstrap-servers: kafka:29092
+  datasource:
+    url:      jdbc:postgresql://postgres:5432/drivers_db
+    username: postgres
+    password: ${POSTGRES_PASSWORD}
   security:
     oauth2:
       resourceserver:
         jwt:
           jwk-set-uri: http://keycloak:8080/realms/taxi-realm/protocol/openid-connect/certs
+  elasticsearch:
+    uris: http://elasticsearch:9200
 
 logging:
   config: classpath:logback-docker.xml

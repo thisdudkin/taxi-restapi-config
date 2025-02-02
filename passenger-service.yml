@@ -22,14 +22,10 @@ spring:
     listener:
       missing-topics-fatal: false
       concurrency: 3
-  liquibase:
-    enabled: true
-    messages:
-      basename: messages
   datasource:
-    url: ${POSTGRES_URL}
-    username: ${POSTGRES_USER}
-    password: ${POSTGRES_PASS}
+    url:      jdbc:postgresql://localhost:5432/passengers_db
+    username: postgres
+    password: ${POSTGRES_PASSWORD:root}
   jpa:
     hibernate:
       ddl-auto: none
@@ -91,6 +87,10 @@ spring:
         url: http://admin-server:8086
   kafka:
     bootstrap-servers: kafka:29092
+  datasource:
+    url:      jdbc:postgresql://postgres:5432/passengers_db
+    username: postgres
+    password: ${POSTGRES_PASSWORD}
   security:
     oauth2:
       resourceserver:
