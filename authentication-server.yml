@@ -1,0 +1,88 @@
+spring:
+  boot:
+    admin:
+      client:
+        enabled: true
+        instance:
+          name: authentication-server
+        url: http://localhost:8086
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:9090/realms/taxi-realm/protocol/openid-connect/certs
+  messages:
+    basename: messages/messages
+
+keycloak:
+  client:
+    id: taxi-client
+    secret: ${KEYCLOAK_CLIENT_SECRET}
+  realm: taxi-realm
+  server-url: http://localhost:9090
+
+management:
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+  endpoint:
+    health:
+      show-details: always
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  metrics:
+    distribution:
+      percentiles-histogram:
+        "[http.server.requests]": true
+    tags:
+      application: authentication-server
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+  boot:
+    admin:
+      client:
+        url: http://admin-server:8086
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://keycloak:8080/realms/taxi-realm/protocol/openid-connect/certs
+
+keycloak:
+  server-url: http://keycloak:8080
+
+logging:
+  config: classpath:logback-docker.xml
+
+management:
+  zipkin:
+    tracing:
+      endpoint: http://tracing-server:9411/api/v2/spans
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://discovery-server:8761/eureka/

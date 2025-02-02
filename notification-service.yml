@@ -1,0 +1,106 @@
+spring:
+  boot:
+    admin:
+      client:
+        enabled: true
+        instance:
+          name: notification-service
+        url: http://localhost:8086
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: notification-service-consumer
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+    producer:
+      acks: all
+      retries: 3
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    listener:
+      missing-topics-fatal: false
+      concurrency: 3
+  datasource:
+    url:      ${POSTGRES_URL}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASS}
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:9090/realms/taxi-realm/protocol/openid-connect/certs
+  liquibase:
+    enabled: true
+    messages:
+      basename: messages
+
+logging:
+  level:
+    liquibase: INFO
+
+management:
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+  endpoint:
+    health:
+      show-details: always
+  tracing:
+    sampling:
+      probability: 1.0
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  metrics:
+    distribution:
+      percentiles-histogram:
+        "[http.server.requests]": true
+    tags:
+      application: notification-service
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+  boot:
+    admin:
+      client:
+        url: http://admin-server:8086
+  kafka:
+    bootstrap-servers: kafka:29092
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://keycloak:8080/realms/taxi-realm/protocol/openid-connect/certs
+
+logging:
+  config: classpath:logback-docker.xml
+
+management:
+  zipkin:
+    tracing:
+      endpoint: http://tracing-server:9411/api/v2/spans
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://discovery-server:8761/eureka/
